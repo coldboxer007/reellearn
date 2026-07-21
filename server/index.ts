@@ -19,6 +19,9 @@ const TEXT_MODEL = process.env.OPENAI_TEXT_MODEL ?? 'gpt-5.6-sol';
 const IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL ?? 'gpt-image-2';
 const AUDIO_MODEL = process.env.OPENAI_AUDIO_MODEL ?? 'tts-1';
 const MODERATION_MODEL = 'omni-moderation-latest';
+const GENERATION_LIMIT_10M = positiveIntegerEnv('REELLEARN_GENERATION_LIMIT_10M', 10, 1, 100);
+const GENERATION_LIMIT_DAY = positiveIntegerEnv('REELLEARN_GENERATION_LIMIT_DAY', 50, 1, 1_000);
+const IMAGE_CONCURRENCY = positiveIntegerEnv('REELLEARN_IMAGE_CONCURRENCY', 2, 1, 4);
 const generatedDirectory = path.resolve(process.cwd(), '.generated');
 const distDirectory = path.resolve(process.cwd(), 'dist');
 const app = express();
@@ -39,6 +42,12 @@ type StableErrorCode =
   | 'SOURCE_INSUFFICIENT'
   | 'RESEARCH_INSUFFICIENT'
   | 'GENERATION_IN_PROGRESS';
+
+function positiveIntegerEnv(name: string, fallback: number, minimum: number, maximum: number) {
+  const parsed = Number(process.env[name]);
+  if (!Number.isInteger(parsed)) return fallback;
+  return Math.min(maximum, Math.max(minimum, parsed));
+}
 
 interface StreamError {
   code: StableErrorCode;
@@ -269,57 +278,67 @@ async function generateInfographics(plan: GeneratedPlan, input: GenerateRequest,
       .map((slide, slideIndex) => ({ topic, topicIndex, slide, slideIndex })),
   );
 
-  return Promise.all(jobs.map(async ({ topic, topicIndex, slide, slideIndex }) => {
-    try {
-      const style = selectedStyle(topic, input);
-      const result = await openai.images.generate(
-        {
-          model: IMAGE_MODEL,
-          prompt: [
-            'DELIVERABLE',
-            'Create one premium portrait educational infographic slide for a mobile learning carousel. Canvas ratio 4:5. It must look like a finished, art-directed publication—not a UI dashboard or a generic template.',
-            '',
-            'LEARNING OBJECTIVE',
-            `${topic.title}: ${slide.subtitle}`,
-            '',
-            'SOURCE-GROUNDED FACTS — VISUALIZE ONLY THESE CLAIMS',
-            ...slide.facts.map((fact) => `- ${fact}`),
-            '',
-            'VISUAL GRAMMAR',
-            `${slide.grammar}. Give the slide one unmistakable entry point and a clear reading path. The spatial arrangement, focal object, annotations, and arrows must express this grammar and this topic specifically.`,
-            '',
-            'ART DIRECTION',
-            slide.artDirection,
-            `Brand skin only: ${templateDirection[style]}. The brand skin must not override the topic-specific layout.`,
-            'Use a detailed focal illustration, layered depth, precise annotation, elegant negative space, and phone-readable hierarchy.',
-            '',
-            'EXACT TEXT — RENDER EACH STRING ONCE, SPELLED EXACTLY',
-            ...slide.exactText.map((text) => `"${text}"`),
-            '',
-            'TYPOGRAPHY',
-            'Crisp modern sans-serif, strong contrast, short labels placed directly beside what they identify. No tiny paragraphs.',
-            '',
-            'CONSTRAINTS',
-            'No other words. No invented facts or numbers. No logos, watermarks, social UI, repeated rounded cards, generic numbered boxes, crossed callout lines, stock-icon collage, or decorative elements that compete with the explanation.',
-          ].join('\n'),
-          size: '1152x1440',
-          quality: topicIndex === 0 ? 'medium' : 'low',
-          output_format: 'webp',
-          output_compression: 82,
-          background: 'opaque',
-          moderation: 'auto',
-          n: 1,
-          user: identifier,
-        },
-        { maxRetries: 0, timeout: 180_000 },
-      );
-      const encoded = result.data?.[0]?.b64_json;
-      if (!encoded) throw new Error('Image response had no data');
-      return { topicIndex, slideIndex, url: await writeAsset(Buffer.from(encoded, 'base64'), 'webp') };
-    } catch {
-      return { topicIndex, slideIndex, url: null };
+  const results: Array<{ topicIndex: number; slideIndex: number; url: string | null }> = Array(jobs.length);
+  let nextJobIndex = 0;
+  const worker = async () => {
+    while (nextJobIndex < jobs.length) {
+      const jobIndex = nextJobIndex;
+      nextJobIndex += 1;
+      const { topic, topicIndex, slide, slideIndex } = jobs[jobIndex];
+      try {
+        const style = selectedStyle(topic, input);
+        const result = await openai.images.generate(
+          {
+            model: IMAGE_MODEL,
+            prompt: [
+              'DELIVERABLE',
+              'Create one premium portrait educational infographic slide for a mobile learning carousel. Canvas ratio 4:5. It must look like a finished, art-directed publication—not a UI dashboard or a generic template.',
+              '',
+              'LEARNING OBJECTIVE',
+              `${topic.title}: ${slide.subtitle}`,
+              '',
+              'SOURCE-GROUNDED FACTS — VISUALIZE ONLY THESE CLAIMS',
+              ...slide.facts.map((fact) => `- ${fact}`),
+              '',
+              'VISUAL GRAMMAR',
+              `${slide.grammar}. Give the slide one unmistakable entry point and a clear reading path. The spatial arrangement, focal object, annotations, and arrows must express this grammar and this topic specifically.`,
+              '',
+              'ART DIRECTION',
+              slide.artDirection,
+              `Brand skin only: ${templateDirection[style]}. The brand skin must not override the topic-specific layout.`,
+              'Use a detailed focal illustration, layered depth, precise annotation, elegant negative space, and phone-readable hierarchy.',
+              '',
+              'EXACT TEXT — RENDER EACH STRING ONCE, SPELLED EXACTLY',
+              ...slide.exactText.map((text) => `"${text}"`),
+              '',
+              'TYPOGRAPHY',
+              'Crisp modern sans-serif, strong contrast, short labels placed directly beside what they identify. No tiny paragraphs.',
+              '',
+              'CONSTRAINTS',
+              'No other words. No invented facts or numbers. No logos, watermarks, social UI, repeated rounded cards, generic numbered boxes, crossed callout lines, stock-icon collage, or decorative elements that compete with the explanation.',
+            ].join('\n'),
+            size: '1152x1440',
+            quality: topicIndex === 0 ? 'medium' : 'low',
+            output_format: 'webp',
+            output_compression: 82,
+            background: 'opaque',
+            moderation: 'auto',
+            n: 1,
+            user: identifier,
+          },
+          { maxRetries: 0, timeout: 180_000 },
+        );
+        const encoded = result.data?.[0]?.b64_json;
+        if (!encoded) throw new Error('Image response had no data');
+        results[jobIndex] = { topicIndex, slideIndex, url: await writeAsset(Buffer.from(encoded, 'base64'), 'webp') };
+      } catch {
+        results[jobIndex] = { topicIndex, slideIndex, url: null };
+      }
     }
-  }));
+  };
+
+  await Promise.all(Array.from({ length: Math.min(IMAGE_CONCURRENCY, jobs.length) }, () => worker()));
+  return results;
 }
 
 interface NarrationAsset {
@@ -508,9 +527,10 @@ function upstreamError(error: unknown): StreamError {
 }
 
 function upstreamDiagnostic(error: unknown) {
-  if (!error || typeof error !== 'object') return { status: 'unknown', code: 'unknown', param: 'unknown', type: 'unknown' };
-  const value = error as { status?: unknown; code?: unknown; param?: unknown; type?: unknown };
+  if (!error || typeof error !== 'object') return { name: 'unknown', status: 'unknown', code: 'unknown', param: 'unknown', type: 'unknown' };
+  const value = error as { name?: unknown; status?: unknown; code?: unknown; param?: unknown; type?: unknown };
   return {
+    name: String(value.name ?? 'unknown'),
     status: String(value.status ?? 'unknown'),
     code: String(value.code ?? 'unknown'),
     param: String(value.param ?? 'unknown'),
@@ -580,9 +600,10 @@ app.post('/api/generate', async (request, response) => {
     });
     return;
   }
-  if (!consumeLimit(`${key}:10m`, 3, 10 * 60_000) || !consumeLimit(`${key}:day`, 20, 24 * 60 * 60_000)) {
+  if (!consumeLimit(`${key}:10m`, GENERATION_LIMIT_10M, 10 * 60_000) || !consumeLimit(`${key}:day`, GENERATION_LIMIT_DAY, 24 * 60 * 60_000)) {
+    response.setHeader('Retry-After', '600');
     response.status(429).json({
-      error: { code: 'AI_RATE_LIMITED', message: 'The local generation limit has been reached. Try again later.', retryable: true, fallbackAllowed: true },
+      error: { code: 'AI_RATE_LIMITED', message: 'The public demo generation limit has been reached. Try again in a few minutes.', retryable: true, fallbackAllowed: true },
       traceId,
     });
     return;
@@ -672,7 +693,7 @@ app.post('/api/generate', async (request, response) => {
       : input.source.text;
 
     send({ type: 'progress', stage: 'series_planner', status: 'running', label: 'Mapping the learning arc', detail: `Planning exactly ${arcPolicy.reelCount} connected reels for ${input.hoursPerWeek}h/week` });
-    const planResponse = await openai.responses.parse(
+    const generatePlanCandidate = () => openai.responses.parse(
       {
         model: TEXT_MODEL,
         instructions: [
@@ -709,8 +730,24 @@ app.post('/api/generate', async (request, response) => {
       },
       { maxRetries: 1, timeout: planningTimeoutMs },
     );
-    const plan = planResponse.output_parsed;
-    if (!plan) throw new Error('Structured plan was empty');
+    let plan: GeneratedPlan | null = null;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const planResponse = await generatePlanCandidate();
+      const candidate = planResponse.output_parsed;
+      if (!candidate) throw new Error('Structured plan was empty');
+      const sourceIsInsufficient = candidate.sourceQuality === 'irrelevant' || candidate.topics.length < 3;
+      const candidateIsValid = hasUniqueAnswers(candidate)
+        && hasValidVisualPlans(candidate)
+        && hasExactConnectedArc(candidate, arcPolicy.reelCount);
+      if (sourceIsInsufficient || candidateIsValid) {
+        plan = candidate;
+        break;
+      }
+      if (attempt === 0) {
+        send({ type: 'progress', stage: 'series_planner', status: 'running', label: 'Repairing the learning arc', detail: 'Running one corrective pass for plan consistency' });
+      }
+    }
+    if (!plan) throw new Error('Generated plan failed semantic validation after one corrective pass');
     if (plan.sourceQuality === 'irrelevant' || plan.topics.length < 3) {
       const insufficient: StreamError = {
         code: 'SOURCE_INSUFFICIENT',
@@ -813,7 +850,7 @@ app.post('/api/generate', async (request, response) => {
     const stable = upstreamError(error);
     send({ type: 'error', error: stable, traceId });
     const diagnostic = upstreamDiagnostic(error);
-    console.warn(`[reellearn:${traceId}] generation failed status=${diagnostic.status} code=${diagnostic.code} param=${diagnostic.param} type=${diagnostic.type} after ${Date.now() - startedAt}ms`);
+    console.warn(`[reellearn:${traceId}] generation failed name=${diagnostic.name} status=${diagnostic.status} code=${diagnostic.code} param=${diagnostic.param} type=${diagnostic.type} after ${Date.now() - startedAt}ms`);
   } finally {
     activeGenerators.delete(key);
     response.end();

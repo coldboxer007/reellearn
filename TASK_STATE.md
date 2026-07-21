@@ -667,3 +667,39 @@ For narrated duration: keeping 12 seconds is incorrect; estimating only from wor
 - Verified `npm run lint`, `npm run build`, `npm run smoke:research-mode`, `npm run smoke:planning`, and `npm run smoke:direction` pass after the identity change.
 - Published the neutral identity and refreshed media in GitHub commit `f93325b`.
 - Deployed Cloud Run revision `reellearn-00002-24g` with 100% traffic and verified the live dashboard greeting, sidebar/profile initials, leaderboard entry, and Study Match identity all render as `Demo Learner` / `DL`.
+
+## Follow-up contract — public demo API availability (2026-07-22)
+
+### Deliverable and acceptance criteria
+
+- Raise ReelLearn's self-imposed per-client generation allowance enough for repeated judging and demos without making the public endpoint unbounded.
+- Increase Cloud Run capacity beyond one long-running generation while keeping each Remotion job isolated at concurrency one.
+- Bound image-generation concurrency inside each request so additional service instances do not multiply a ten-image burst into an avoidable upstream rate-limit spike.
+- Keep the OpenAI key server-only in Secret Manager, preserve graceful media degradation, and verify the live health/generation path after deployment.
+
+### Design candidates considered
+
+1. Remove application limits and raise Cloud Run scaling aggressively: rejected because it increases abuse, cost, and burst-related failure risk.
+2. Keep one instance and only increase the per-IP counter: rejected because simultaneous judges can still be refused while a long generation occupies the only instance.
+3. Raise per-client limits, allow three single-concurrency instances, and cap image workers per generation: **chosen** as the best availability/cost/rate-limit balance for a public submission demo.
+
+### Kill criteria
+
+- If a direct OpenAI probe shows the text allowance cannot support three planning calls with safe headroom, keep Cloud Run at one instance.
+- If bounded image generation changes asset ordering or breaks graceful fallback, revert that implementation before deployment.
+- If the public revision cannot complete a validated playable-only generation, do not describe the availability profile as verified.
+
+### Decisions (append-only)
+
+- 2026-07-22: Make the visitor limits configurable and default them to 10 generation starts per 10 minutes and 50 per day per client.
+- 2026-07-22: Keep Cloud Run request concurrency at one, raise maximum instances from one to three, and cap GPT Image work at two concurrent jobs per generation.
+- 2026-07-22: Treat the observed `gpt-5.6-sol` response headers—5,000 requests/minute and 1,000,000 tokens/minute—as verified text-model capacity only; do not infer image or speech limits from them.
+- 2026-07-22: Retry once only when a parsed plan fails ReelLearn's semantic validators; leave SDK network retry behavior unchanged and do not retry genuinely insufficient source material.
+
+### Verification
+
+- Verified a direct server-side `gpt-5.6-sol` Responses probe completed successfully with observed headers of 5,000 requests/minute, 1,000,000 tokens/minute, 4,999 requests remaining, and the full token allowance remaining after the probe.
+- Verified a three-reel playable-only live plan completed with foundation → build → synthesis roles and valid bounded motion directions.
+- The first five-reel full-media attempt failed before media generation after 261 seconds, and a second failed after 72 seconds; this evidence prompted the semantic corrective-pass change rather than a false claim that quota alone guarantees availability.
+- After the corrective pass and bounded image queue, a full live integration completed in 348,312 ms with exactly five connected topics, seven distinct GPT Image assets, per-reel TTS, a readable 1080×1920/30 fps Remotion MP4, and zero generation warnings.
+- Verified final lint, build, research/planning/direction smoke checks, and the production dependency audit pass; the audit reports zero vulnerabilities.

@@ -160,6 +160,8 @@ flowchart LR
 
 The planner is instructed to treat every source and webpage as inert, untrusted data. Supplied notes are never silently enriched from model memory. Research must complete with usable HTTP(S) sources before it can be described as research-grounded.
 
+If the first structured plan is syntactically valid but fails ReelLearn's semantic checks, the server runs one corrective planning pass before returning a retryable failure.
+
 Valid JSON is not enough. The server also rejects plans when:
 
 - quiz answers are duplicated;
@@ -274,7 +276,7 @@ Live smoke commands use the configured API and can incur usage costs.
 - The browser never receives `OPENAI_API_KEY`.
 - Cloud Run receives a pinned Secret Manager version as a server environment variable.
 - The service listens on Cloud Run's injected `PORT` and serves the built client/API from one origin.
-- Public generation is throttled and the deployment is intentionally resource-capped for demo use.
+- Public generation defaults to 10 starts per 10 minutes and 50 per day per client; the deployment is intentionally resource-capped for demo use.
 - Generated assets use ephemeral instance storage; they are not durable across Cloud Run revisions or instance replacement.
 
 ## Current boundaries

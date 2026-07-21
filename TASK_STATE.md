@@ -644,3 +644,24 @@ For narrated duration: keeping 12 seconds is incorrect; estimating only from wor
 - Deployed Cloud Run revision `reellearn-00001-9qg` with 100% traffic and a pinned Secret Manager reference; `GET /api/health` reports OpenAI configured without returning credential material.
 - Verified the public browser flow at `https://reellearn-697390864676.us-central1.run.app/`: cold load, Create navigation, exact Oedipus Rex research routing, enabled Continue, capacity controls, Class navigation, reaction state change, and explicit local-demo notification.
 - Verified one real playable-only cloud generation streamed meta/progress/result events, returned the exact three-topic arc for two weekly hours, emitted no warnings, and included a trace ID.
+
+## Follow-up contract — neutral demo identity (2026-07-22)
+
+### Deliverable and acceptance criteria
+
+- Remove the developer's personal name and initials from every application-owned demo identity surface.
+- Use one consistent, product-appropriate neutral identity across the greeting, navigation shell, profile affordance, mock data, and leaderboard.
+- Refresh any public README/submission screenshots that still expose the previous identity.
+- Re-run build/lint, publish the update, redeploy Cloud Run, and verify the public greeting and class leaderboard.
+
+### Decisions (append-only)
+
+- 2026-07-22: Use `Demo Learner` and initials `DL`; prefer `Welcome back, Demo Learner.` over a time-specific greeting so the public demo remains accurate in every timezone.
+
+### Verification
+
+- Verified no case-insensitive `Sahil`, `Sahil Tanna`, personalized greeting, `ST` avatar, or `ST` activity-initial pattern remains in application-owned text source.
+- Verified the local browser renders `Welcome back, Demo Learner.`, `Demo Learner`, and `DL` in the dashboard shell and renders the same identity in the class leaderboard.
+- Refreshed the nine affected original screenshots and their gallery-ready 3:2 copies; OCR found zero old-name matches across all 24 PNG files.
+- Verified all 12 originals are true PNGs at 1280×720 (`01`–`11`) or 390×844 (`12`), and all 12 submission copies remain true PNGs below 5 MB.
+- Verified `npm run lint`, `npm run build`, `npm run smoke:research-mode`, `npm run smoke:planning`, and `npm run smoke:direction` pass after the identity change.

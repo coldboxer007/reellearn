@@ -496,8 +496,8 @@ export const mockClass: ClassPulse = {
 };
 
 export const mockUser: UserProfile = {
-  handle: 'sahil',
-  display_name: 'Sahil',
+  handle: 'demo-learner',
+  display_name: 'Demo Learner',
   streak: 7,
   longestStreak: 14,
   masteredCount: 3,

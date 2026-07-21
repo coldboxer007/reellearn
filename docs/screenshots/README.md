@@ -54,8 +54,7 @@ Curated on 22 July 2026 from the running web app. These unannotated source captu
 
 ## Capture dimensions
 
-- Detailed desktop workspace captures: 1440×1000 (`01`–`05`).
-- Presentation-format product captures: 1280×720 (`06`–`11`).
+- Desktop and presentation captures: 1280×720 (`01`–`11`).
 - Mobile responsive capture: 390×844 (`12`).
 
 The PNG files are unannotated source captures. Add external submission labels or crops only to copies so these originals remain reusable.

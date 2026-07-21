@@ -144,8 +144,8 @@ export default function App() {
         </div>
 
         <div className="sidebar-user">
-          <span className="user-avatar">ST<i /></span>
-          <div><strong>Sahil Tanna</strong><span><Flame size={12} fill="currentColor" /> 9 day streak</span></div>
+          <span className="user-avatar">DL<i /></span>
+          <div><strong>Demo Learner</strong><span><Flame size={12} fill="currentColor" /> 9 day streak</span></div>
           <button type="button" aria-label="Account menu">•••</button>
         </div>
       </aside>
@@ -162,7 +162,7 @@ export default function App() {
           <div className="topbar-actions">
             <div className="streak-pill"><Flame size={15} fill="currentColor" /><strong>9</strong><span>day streak</span></div>
             <button type="button" className="icon-button notification-button" aria-label="Notifications"><Bell size={19} /><span /></button>
-            <button type="button" className="topbar-avatar" aria-label="Open profile">ST</button>
+            <button type="button" className="topbar-avatar" aria-label="Open profile">DL</button>
           </div>
         </header>
 

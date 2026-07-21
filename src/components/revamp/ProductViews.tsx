@@ -64,7 +64,7 @@ export function TodayView({ workspace, onNavigate, onOpen, contentOpen = false }
       <header className="today-welcome">
         <div>
           <p className="eyebrow"><span className="live-dot" /> Tuesday · your learning pulse</p>
-          <h1>Good afternoon, Sahil.</h1>
+          <h1>Welcome back, Demo Learner.</h1>
           <p>You’re one focused session away from keeping your week on track.</p>
         </div>
         <button type="button" className="button-primary" onClick={() => onNavigate('create')}>
@@ -318,7 +318,7 @@ const leaderboardSeed = [
   { id: 'maya', initials: 'MC', name: 'Maya Chen', color: '#ff9b73', weekXp: 1290, allTimeXp: 11240, movement: 2 },
   { id: 'arjun', initials: 'AS', name: 'Arjun Singh', color: '#7a70f8', weekXp: 1100, allTimeXp: 11890, movement: -1 },
   { id: 'noor', initials: 'NK', name: 'Noor Khan', color: '#45b995', weekXp: 980, allTimeXp: 8690, movement: 1 },
-  { id: 'you', initials: 'ST', name: 'Sahil Tanna', color: '#513ea8', weekXp: 940, allTimeXp: 8320, movement: 1, isYou: true },
+  { id: 'you', initials: 'DL', name: 'Demo Learner', color: '#513ea8', weekXp: 940, allTimeXp: 8320, movement: 1, isYou: true },
   { id: 'leo', initials: 'LR', name: 'Leo Rivera', color: '#e4a441', weekXp: 810, allTimeXp: 7540, movement: 0 },
 ];
 
@@ -441,7 +441,7 @@ export function ClassroomView({ workspace, onOpen }: WorkspaceViewProps) {
     if (!message) return;
     setPostedActivities((current) => [{
       id: `you-update-${activitySequence.current++}`,
-      initials: 'ST',
+      initials: 'DL',
       name: 'You',
       action: `shared: “${message}”`,
       time: 'now',
@@ -491,7 +491,7 @@ export function ClassroomView({ workspace, onOpen }: WorkspaceViewProps) {
     setChallengeStatus('complete');
     setPostedActivities((current) => [{
       id: `you-challenge-${activitySequence.current++}`,
-      initials: 'ST',
+      initials: 'DL',
       name: 'You',
       action: `completed the class challenge · ${score}/${challengeTopics.length}`,
       time: 'now',
@@ -634,7 +634,7 @@ export function ClassroomView({ workspace, onOpen }: WorkspaceViewProps) {
         <aside>
           <section className={`study-match-card ${matched ? 'has-match' : ''}`} aria-live="polite">
             {!matched ? (
-              <><div className="match-orbits" aria-hidden><span>ST</span><i /><i /></div><p className="eyebrow">STUDY MATCH · DEMO</p><h2>Find someone on your concept.</h2><p>We’ll simulate a match with a classmate studying <strong>{primaryTopic?.title ?? workspace.title}</strong> this week.</p><button type="button" disabled={matching} onClick={findMatch}>{matching ? <><span className="mini-loader" /> Finding your match…</> : <>Find my study match <ArrowRight size={16} /></>}</button><small>Local simulation · first name only · no account created</small></>
+              <><div className="match-orbits" aria-hidden><span>DL</span><i /><i /></div><p className="eyebrow">STUDY MATCH · DEMO</p><h2>Find someone on your concept.</h2><p>We’ll simulate a match with a classmate studying <strong>{primaryTopic?.title ?? workspace.title}</strong> this week.</p><button type="button" disabled={matching} onClick={findMatch}>{matching ? <><span className="mini-loader" /> Finding your match…</> : <>Find my study match <ArrowRight size={16} /></>}</button><small>Local simulation · first name only · no account created</small></>
             ) : (
               <><p className="eyebrow">MATCH FOUND · 86% OVERLAP</p><div className="matched-profile"><span>MC</span><div><h2>Maya Chen</h2><p>Demo profile · 7 day streak</p></div></div><p className="match-reason">You’re both revising {primaryTopic?.title ?? workspace.title} and prefer short evening sessions.</p><div className="shared-topic"><Target size={16} /><div><span>Shared next concept</span><strong>{nextTopic?.title ?? workspace.title}</strong></div></div>{primaryTopic && <button type="button" onClick={() => onOpen(primaryTopic, 'playable')}><Zap size={16} /> Race the recall round</button>}<button type="button" className="match-message" disabled={helloSent} onClick={sendHello}>{helloSent ? <><Check size={16} /> Hello added</> : <><MessageCircle size={16} /> Send a study hello</>}</button><small>Matches stay in this demo; no message will be sent.</small></>
             )}

@@ -665,3 +665,5 @@ For narrated duration: keeping 12 seconds is incorrect; estimating only from wor
 - Refreshed the nine affected original screenshots and their gallery-ready 3:2 copies; OCR found zero old-name matches across all 24 PNG files.
 - Verified all 12 originals are true PNGs at 1280×720 (`01`–`11`) or 390×844 (`12`), and all 12 submission copies remain true PNGs below 5 MB.
 - Verified `npm run lint`, `npm run build`, `npm run smoke:research-mode`, `npm run smoke:planning`, and `npm run smoke:direction` pass after the identity change.
+- Published the neutral identity and refreshed media in GitHub commit `f93325b`.
+- Deployed Cloud Run revision `reellearn-00002-24g` with 100% traffic and verified the live dashboard greeting, sidebar/profile initials, leaderboard entry, and Study Match identity all render as `Demo Learner` / `DL`.

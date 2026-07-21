@@ -1,0 +1,13 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+.generated
+.playwright-cli
+dist
+docs
+node_modules
+TASK_STATE.md
+reellearn_spec.md
+*.log

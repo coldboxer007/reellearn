@@ -1,0 +1,142 @@
+.reel-card {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  color: #ece8e0;
+  background: linear-gradient(168deg, var(--reel-a) 0%, var(--reel-b) 48%, #0e1014 100%);
+}
+
+.reel-wash {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 55% at 65% 32%, color-mix(in srgb, var(--reel-accent) 28%, transparent), transparent 62%),
+    linear-gradient(180deg, transparent 35%, rgba(14, 16, 20, 0.55) 68%, rgba(14, 16, 20, 0.94) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.reel-vignette {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.reel-viz {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.reel-meta {
+  position: absolute;
+  left: 20px;
+  right: 72px;
+  bottom: calc(var(--tab-h) + var(--safe-bottom) + 18px);
+  z-index: 5;
+}
+
+.reel-card.is-active .reel-meta {
+  animation: meta-rise 0.55s var(--ease-out);
+}
+
+.reel-series-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.reel-series {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--reel-accent) 75%, #fff);
+}
+
+.reel-dur {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(236, 232, 224, 0.4);
+}
+
+.reel-topic {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.55);
+  max-width: 13ch;
+}
+
+.reel-caption-block {
+  padding-top: 14px;
+  border-top: 1px solid rgba(236, 232, 224, 0.12);
+}
+
+.reel-side {
+  position: absolute;
+  right: 14px;
+  bottom: calc(var(--tab-h) + var(--safe-bottom) + 100px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  z-index: 6;
+}
+
+.reel-icon-btn {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  background: rgba(14, 16, 20, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(12px);
+}
+
+.reel-theme-chip {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-brand);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(236, 232, 224, 0.5);
+}
+
+.reel-progress {
+  position: absolute;
+  top: calc(36px + var(--safe-top));
+  left: 20px;
+  right: 20px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 8;
+  overflow: hidden;
+}
+
+.reel-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #fff 0%, var(--reel-accent) 100%);
+}
+
+@keyframes meta-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

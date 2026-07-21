@@ -1,0 +1,219 @@
+.building-card {
+  height: 100%;
+  background:
+    radial-gradient(ellipse 90% 40% at 10% -5%, color-mix(in srgb, var(--build-accent) 22%, transparent), transparent 55%),
+    linear-gradient(180deg, #151820 0%, #0e1014 100%);
+  padding: calc(56px + var(--safe-top)) 22px calc(var(--tab-h) + var(--safe-bottom) + 24px);
+  overflow-y: auto;
+  color: #ece8e0;
+}
+
+.building-inner {
+  max-width: 360px;
+}
+
+.building-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--build-accent);
+  font-weight: 650;
+  margin-bottom: 12px;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--build-accent);
+  animation: live-pulse 1.6s ease infinite;
+}
+
+.building-title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  margin-bottom: 10px;
+}
+
+.building-meta {
+  font-size: 13px;
+  color: rgba(236, 232, 224, 0.5);
+  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.building-meta .dot {
+  opacity: 0.4;
+}
+
+.building-progress {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.building-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--build-accent), #fff);
+  transition: width 0.6s var(--ease);
+}
+
+.building-pct {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(236, 232, 224, 0.35);
+  margin: 8px 0 20px;
+}
+
+.building-stages {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 26px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.stage {
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 14px;
+}
+
+.stage-mark {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.stage-done .stage-mark {
+  background: var(--mint);
+}
+
+.stage-running .stage-mark {
+  background: var(--build-accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--build-accent) 22%, transparent);
+  animation: pulse-dot 1.4s ease infinite;
+}
+
+.stage-label {
+  color: rgba(236, 232, 224, 0.32);
+}
+
+.stage-done .stage-label {
+  color: rgba(236, 232, 224, 0.65);
+}
+
+.stage-running .stage-label {
+  color: #ece8e0;
+  font-weight: 600;
+}
+
+.stage-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(236, 232, 224, 0.3);
+}
+
+.stage-running .stage-tag {
+  color: var(--build-accent);
+}
+
+.building-reels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.building-tile {
+  aspect-ratio: 3 / 4;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  transition: border-color 0.4s, background 0.4s;
+}
+
+.building-tile.status-published {
+  background: linear-gradient(165deg, color-mix(in srgb, var(--build-accent) 24%, transparent), transparent 70%);
+  border-color: color-mix(in srgb, var(--build-accent) 40%, transparent);
+  animation: tile-pop 0.45s var(--ease-out);
+}
+
+.tile-n {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--build-accent);
+  font-weight: 600;
+}
+
+.tile-n.muted {
+  color: rgba(236, 232, 224, 0.25);
+}
+
+.tile-topic {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.tile-pending {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.tile-skel {
+  height: 8px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+.tile-skel.short {
+  width: 55%;
+}
+
+.building-foot {
+  font-size: 12px;
+  color: rgba(236, 232, 224, 0.32);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--build-accent) 18%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--build-accent) 6%, transparent); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes tile-pop {
+  from { opacity: 0.4; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

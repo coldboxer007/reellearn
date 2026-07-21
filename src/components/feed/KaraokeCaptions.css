@@ -1,0 +1,21 @@
+.karaoke {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: rgba(242, 240, 234, 0.32);
+  max-width: 100%;
+}
+
+.karaoke-word {
+  transition: color 0.14s ease, opacity 0.14s ease;
+  display: inline;
+}
+
+.karaoke-word.past {
+  color: rgba(242, 240, 234, 0.7);
+}
+
+.karaoke-word.on {
+  color: #fff;
+  font-weight: 650;
+}

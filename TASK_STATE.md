@@ -703,3 +703,6 @@ For narrated duration: keeping 12 seconds is incorrect; estimating only from wor
 - The first five-reel full-media attempt failed before media generation after 261 seconds, and a second failed after 72 seconds; this evidence prompted the semantic corrective-pass change rather than a false claim that quota alone guarantees availability.
 - After the corrective pass and bounded image queue, a full live integration completed in 348,312 ms with exactly five connected topics, seven distinct GPT Image assets, per-reel TTS, a readable 1080×1920/30 fps Remotion MP4, and zero generation warnings.
 - Verified final lint, build, research/planning/direction smoke checks, and the production dependency audit pass; the audit reports zero vulnerabilities.
+- Published the availability changes in GitHub commit `792a86a` and deployed Cloud Run revision `reellearn-00003-9fl` with 100% traffic.
+- Verified the live revision reports OpenAI configured, uses the pinned Secret Manager reference, exposes no key, has maximum scale 3/concurrency 1, and carries the explicit 10/50/two-worker availability configuration.
+- Verified a fresh public playable-only generation streamed meta/progress/result, returned exactly three OpenAI-planned topics for the two-hour band, emitted zero warnings, and included a trace ID.

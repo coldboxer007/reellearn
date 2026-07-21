@@ -624,3 +624,23 @@ For narrated duration: keeping 12 seconds is incorrect; estimating only from wor
 ### Decisions (append-only)
 
 - 2026-07-22: Keep captions as conversation-delivered submission copy and retain only a neutral visual gallery in repository documentation.
+- 2026-07-22: Seed the empty public GitHub repository directly on `main`; an initial draft PR would have no base commit to review against.
+- 2026-07-22: Deploy one same-origin Cloud Run service in `us-central1` with 2 vCPU, 4 GiB memory, concurrency 1, a 900-second timeout, and one maximum instance so Remotion jobs remain serialized and demo cost has an infrastructure cap.
+- 2026-07-22: Store the OpenAI key in Secret Manager as `reellearn-openai-api-key` version 1 and pin the Cloud Run environment reference to that version; never pass the key as plaintext source or a browser environment variable.
+- 2026-07-22: Regenerate npm's optional-package lock metadata after Cloud Build's clean install exposed missing `@emnapi` entries that the reused local install did not reveal.
+- 2026-07-22: Keep original screenshots untouched and create separate 3:2 submission copies under `docs/submission-media/`.
+
+### Verification
+
+- Replaced the 675-line engineering narrative with a 317-line layered GitHub README that keeps product proof, architecture, setup, safety, verification, current boundaries, and the judge-critical GPT-5.6 Ultra/Codex acceleration ledger.
+- Verified all 15 local README links resolve and the caption index no longer appears in repository documentation.
+- Verified 12 submission PNGs are true PNG files, have 3:2 presentation dimensions (1440×960 or 1200×800), and are individually below the 5 MB gallery limit.
+- Verified `npm run lint`, `npm run build`, `npm run smoke:research-mode`, `npm run smoke:planning`, and `npm run smoke:direction` pass.
+- Verified `npm run smoke:remotion` produced a 2,791,123-byte H.264 MP4 at 1080×1920, 30 fps, and 360 frames.
+- Verified `npm audit --omit=dev` reports zero vulnerabilities.
+- Verified credential-pattern scans and exact-value comparison against `OPENAI_API_KEY` found zero matches in source, documentation, staged files, or the production browser bundle.
+- Verified clean-install compatibility under npm 10 and npm 11 after the lockfile correction.
+- Published the public repository at `https://github.com/coldboxer007/reellearn` and pushed the corrected Cloud Build lockfile on `main`.
+- Deployed Cloud Run revision `reellearn-00001-9qg` with 100% traffic and a pinned Secret Manager reference; `GET /api/health` reports OpenAI configured without returning credential material.
+- Verified the public browser flow at `https://reellearn-697390864676.us-central1.run.app/`: cold load, Create navigation, exact Oedipus Rex research routing, enabled Continue, capacity controls, Class navigation, reaction state change, and explicit local-demo notification.
+- Verified one real playable-only cloud generation streamed meta/progress/result events, returned the exact three-topic arc for two weekly hours, emitted no warnings, and included a trace ID.

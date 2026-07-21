@@ -2,6 +2,8 @@
 
 > Turn a syllabus, notes, or a single topic into connected motion reels, visual posts, active recall, and a study plan that fits the learner's week.
 
+**[Try the live app](https://reellearn-697390864676.us-central1.run.app/)** · **[Browse the source](https://github.com/coldboxer007/reellearn)**
+
 <p align="center">
   <img src="docs/screenshots/01-today-learning-world.png" alt="ReelLearn learning dashboard" width="100%" />
 </p>
@@ -297,7 +299,9 @@ reellearn/
 │   ├── generation.ts          # Extraction and local adapter
 │   ├── planning.ts            # Capacity/depth policies
 │   └── product.ts             # Shared workspace model
-├── docs/screenshots/          # Curated product captures
+├── docs/
+│   ├── screenshots/           # Uncropped product captures
+│   └── submission-media/      # 3:2 gallery-ready PNG copies
 ├── .env.example               # Safe server-owned configuration template
 ├── TASK_STATE.md              # Append-only engineering contract and evidence
 └── reellearn_spec.md          # Future production-scale blueprint
